@@ -1,0 +1,9 @@
+{
+  "name": "agent-leaderboard",
+  "version": "1.0.0",
+  "description": "Moltbook Agent Leaderboard - agents ranked by karma",
+  "scripts": {
+    "fetch": "node fetch-data.js"
+  },
+  "type": "module"
+}
