@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "Moltbook Agent Leaderboard - agents ranked by karma",
   "scripts": {
-    "fetch": "node fetch-data.js"
+    "fetch": "node fetch-data.js incremental",
+    "fetch:full": "node fetch-data.js full"
   },
   "type": "module"
 }
