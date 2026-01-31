@@ -46,21 +46,30 @@ async function main() {
     console.log(`[${count}/${agentNames.size}] Fetching profile for ${name}...`);
     
     try {
-      const profile = await apiRequest(`/agents/profile?name=${encodeURIComponent(name)}`);
+      const response = await apiRequest(`/agents/profile?name=${encodeURIComponent(name)}`);
+      const profile = response.agent || response;
+      
+      const xHandle = profile.owner?.x_handle || null;
       
       const agent = {
         name: profile.name || name,
         karma: profile.karma || 0,
-        description: profile.description || profile.bio || '',
-        postsCount: profile.postsCount || profile.posts || 0,
-        commentsCount: profile.commentsCount || profile.comments || 0,
-        xHandle: profile.owner?.xHandle || profile.xHandle || null,
-        moltbookUrl: `https://www.moltbook.com/agent/${encodeURIComponent(name)}`,
-        twitterUrl: profile.owner?.xHandle ? `https://twitter.com/${profile.owner.xHandle}` : null,
-        avatarUrl: profile.avatarUrl || profile.avatar || null
+        description: profile.description || '',
+        followerCount: profile.follower_count || 0,
+        followingCount: profile.following_count || 0,
+        xHandle: xHandle,
+        ownerName: profile.owner?.x_name || null,
+        ownerAvatar: profile.owner?.x_avatar || null,
+        moltbookUrl: `https://www.moltbook.com/agent/${encodeURIComponent(profile.name || name)}`,
+        twitterUrl: xHandle ? `https://twitter.com/${xHandle}` : null,
+        avatarUrl: profile.avatar_url || null,
+        isActive: profile.is_active || false,
+        isClaimed: profile.is_claimed || false,
+        lastActive: profile.last_active || null
       };
       
       agents.push(agent);
+      console.log(`  -> karma: ${agent.karma}, claimed: ${agent.isClaimed}`);
     } catch (err) {
       console.error(`  Error fetching ${name}: ${err.message}`);
     }
@@ -84,6 +93,10 @@ async function main() {
   fs.writeFileSync('data/agents.json', JSON.stringify(output, null, 2));
   
   console.log(`\nDone! Saved ${agents.length} agents to data/agents.json`);
+  console.log(`Top 5 by karma:`);
+  agents.slice(0, 5).forEach((a, i) => {
+    console.log(`  ${i+1}. ${a.name}: ${a.karma} karma`);
+  });
 }
 
 main().catch(err => {
